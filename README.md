@@ -1,5 +1,9 @@
 # PASSWORD_CHECKING
 
+<p align="center">
+    <img src="image.png" alt="Password Checking" width="700">
+</p>
+
 A password strength evaluation project that analyzes passwords using multiple algorithms and approaches, including:
 
 * Brute Force
