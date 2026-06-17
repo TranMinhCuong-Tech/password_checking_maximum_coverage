@@ -2,6 +2,7 @@ import string
 import time
 import tracemalloc
 
+# Nhóm hàm kiểm tra rule cơ bản.
 def first_char_upper(password):
     return len(password) > 0 and password[0].isupper()
 
@@ -25,7 +26,8 @@ def ends_with_special(password):
 def starts_with_special(password):
     return len(password) > 0 and password[0] in string.punctuation
 
-
+# Rule mật khẩu chuẩn: dài hơn 15 ký tự, bắt đầu bằng chữ hoa,
+# đồng thời phải có ít nhất một chữ số và một ký tự đặc biệt.
 def standard_password(password):
     """
     Standard Password:
@@ -37,11 +39,12 @@ def standard_password(password):
     return (
         len(password) > 15
         and password[0].isupper()
-        and any(c.isdigit() for c in password)
-        and any(c in string.punctuation for c in password)
+        and any(c.isdigit() for c in password) # co so trong password
+        and any(c in string.punctuation for c in password) # co ky tu dac biet trong password
     )
 
 
+# Ánh xạ lựa chọn menu -> hàm kiểm tra -> file output.
 RULES = {
     1: (first_char_upper,    "output_brute_first_char_upper.txt"),
     2: (all_upper,           "output_brute_all_upper.txt"),
@@ -53,7 +56,7 @@ RULES = {
 }
 
 
-
+# Đọc danh sách password từ file passwords.txt, bỏ qua các dòng rỗng.
 def load_passwords(filename="passwords.txt"):
     try:
         with open(filename, "r", encoding="utf-8") as f:
@@ -62,7 +65,7 @@ def load_passwords(filename="passwords.txt"):
         print(f"[!] File '{filename}' not found.")
         return []
 
-
+# Lưu các password thỏa điều kiện ra file output.
 def save_results(passwords, filename):
     with open(filename, "w", encoding="utf-8") as f:
         for password in passwords:
@@ -70,12 +73,12 @@ def save_results(passwords, filename):
     print(f"[+] Results saved to: {filename}")
 
 
-
+# Benchmark: duyệt toàn bộ password, đo thời gian và bộ nhớ.
 def benchmark(rule_function, passwords, output_file):
     tracemalloc.start()
     start_time = time.perf_counter()
 
-    # Brute Force: duyệt toàn bộ, không bỏ qua bất kỳ phần tử nào
+    # Brute Force: kiểm tra từng password lần lượt.
     matched = []
     for password in passwords:
         if rule_function(password):
@@ -99,6 +102,7 @@ def benchmark(rule_function, passwords, output_file):
 
 
 def check_password(choice, passwords=None):
+    # Chọn rule theo menu rồi chạy benchmark.
     if passwords is None:
         passwords = load_passwords()
     if not passwords:

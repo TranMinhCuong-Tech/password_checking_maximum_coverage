@@ -16,12 +16,12 @@ import tracemalloc
 
 
 def first_char_upper(password):
-    # Greedy: chỉ xét ký tự đầu tiên, quyết định ngay
+    # Chỉ cần xem ký tự đầu tiên là đủ kết luận.
     return len(password) > 0 and password[0].isupper()
 
 
 def all_upper(password):
-    # Greedy: duyệt đến ký tự thường đầu tiên thì dừng
+    # Dừng ngay khi gặp ký tự không phải chữ hoa.
     if not password:
         return False
     for ch in password:
@@ -31,7 +31,7 @@ def all_upper(password):
 
 
 def all_lower(password):
-    # Greedy: duyệt đến ký tự hoa đầu tiên thì dừng
+    # Dừng ngay khi gặp ký tự không phải chữ thường.
     if not password:
         return False
     for ch in password:
@@ -41,26 +41,26 @@ def all_lower(password):
 
 
 def ends_with_digit(password):
-    # Greedy: chỉ xét ký tự cuối
+    # Chỉ cần kiểm tra ký tự cuối.
     return len(password) > 0 and password[-1].isdigit()
 
 
 def ends_with_special(password):
-    # Greedy: chỉ xét ký tự cuối
+    # Chỉ cần kiểm tra ký tự cuối.
     return len(password) > 0 and password[-1] in string.punctuation
 
 
 def starts_with_special(password):
-    # Greedy: chỉ xét ký tự đầu
+    # Chỉ cần kiểm tra ký tự đầu.
     return len(password) > 0 and password[0] in string.punctuation
 
 
 def standard_password(password):
     """
     Greedy Standard Password – sắp xếp điều kiện từ rẻ → đắt:
-    1. Kiểm tra độ dài trước (O(1))
-    2. Kiểm tra ký tự đầu (O(1))
-    3. Duyệt một lần, gom cả has_digit + has_special (early-exit khi đủ cả hai)
+    1. Kiểm tra độ dài trước.
+    2. Kiểm tra ký tự đầu.
+    3. Duyệt một lần để tìm cả số và ký tự đặc biệt.
     """
     if len(password) <= 15:
         return False
@@ -74,10 +74,11 @@ def standard_password(password):
             has_digit = True
         elif ch in string.punctuation:
             has_special = True
-        if has_digit and has_special:   # đủ điều kiện → thoát sớm
+        if has_digit and has_special:   # Đủ điều kiện thì thoát sớm.
             return True
     return False
 
+# Ánh xạ lựa chọn menu -> hàm kiểm tra -> file output.
 RULES = {
     1: (first_char_upper,    "output_greedy_first_char_upper.txt"),
     2: (all_upper,           "output_greedy_all_upper.txt"),
@@ -90,6 +91,7 @@ RULES = {
 
 
 def load_passwords(filename="passwords.txt"):
+    # Đọc danh sách password từ file, bỏ qua các dòng rỗng.
     try:
         with open(filename, "r", encoding="utf-8") as f:
             return [line.strip() for line in f if line.strip()]
@@ -99,6 +101,7 @@ def load_passwords(filename="passwords.txt"):
 
 
 def save_results(passwords, filename):
+    # Ghi các password thỏa điều kiện ra file kết quả.
     with open(filename, "w", encoding="utf-8") as f:
         for password in passwords:
             f.write(password + "\n")
@@ -106,6 +109,7 @@ def save_results(passwords, filename):
 
 
 def benchmark(rule_function, passwords, output_file):
+    # Đo thời gian và bộ nhớ trong lúc kiểm tra toàn bộ danh sách password.
     tracemalloc.start()
     start_time = time.perf_counter()
 
@@ -132,6 +136,7 @@ def benchmark(rule_function, passwords, output_file):
 
 
 def check_password(choice, passwords=None):
+    # Hàm điều phối: chọn rule theo menu rồi chạy benchmark.
     if passwords is None:
         passwords = load_passwords()
     if not passwords:

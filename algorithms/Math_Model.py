@@ -4,34 +4,39 @@ import tracemalloc
 
 
 def first_char_upper(password):
+    # Kiểm tra ký tự đầu có phải chữ hoa hay không.
     return len(password) > 0 and password[0].isupper()
 
 
 def all_upper(password):
+    # Dùng hàm built-in để kiểm tra toàn chuỗi chữ hoa.
     return password.isupper()
 
 
 def all_lower(password):
+    # Dùng hàm built-in để kiểm tra toàn chuỗi chữ thường.
     return password.islower()
 
 
 def ends_with_digit(password):
+    # Kiểm tra ký tự cuối có phải chữ số.
     return len(password) > 0 and password[-1].isdigit()
 
 
 def ends_with_special(password):
+    # Kiểm tra ký tự cuối có thuộc nhóm ký tự đặc biệt hay không.
     return len(password) > 0 and password[-1] in string.punctuation
 
 
 def starts_with_special(password):
+    # Kiểm tra ký tự đầu có phải ký tự đặc biệt hay không.
     return len(password) > 0 and password[0] in string.punctuation
 
 
 def standard_password(password):
     """
     Math-model style password check.
-    This keeps the same rule set as the other algorithms, but uses compact
-    boolean expressions so the module can participate in the benchmark flow.
+    Cách viết gọn bằng biểu thức boolean, nhưng logic vẫn giống các module khác.
     """
     return (
         len(password) > 15
@@ -42,6 +47,7 @@ def standard_password(password):
 
 
 def load_passwords(filename="passwords.txt"):
+    # Đọc danh sách password từ file đầu vào.
     try:
         with open(filename, "r", encoding="utf-8") as f:
             return [line.strip() for line in f if line.strip()]
@@ -51,6 +57,7 @@ def load_passwords(filename="passwords.txt"):
 
 
 def save_results(passwords, filename):
+    # Ghi danh sách password hợp lệ ra file output.
     with open(filename, "w", encoding="utf-8") as f:
         for password in passwords:
             f.write(password + "\n")
@@ -59,6 +66,7 @@ def save_results(passwords, filename):
 
 
 def benchmark(rule_function, passwords, output_file):
+    # Chạy kiểm tra và đo hiệu năng cho từng rule.
     tracemalloc.start()
     start_time = time.perf_counter()
 
@@ -85,6 +93,7 @@ def benchmark(rule_function, passwords, output_file):
 
 
 RULES = {
+    # Ánh xạ lựa chọn menu -> hàm kiểm tra -> file output.
     1: (first_char_upper, "output_math_model_first_char_upper.txt"),
     2: (all_upper, "output_math_model_all_upper.txt"),
     3: (all_lower, "output_math_model_all_lower.txt"),
@@ -96,6 +105,7 @@ RULES = {
 
 
 def check_password(choice, passwords=None):
+    # Chọn rule theo menu rồi chạy benchmark.
     if passwords is None:
         passwords = load_passwords()
     if not passwords:
