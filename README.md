@@ -168,23 +168,24 @@ Notes:
 
 ## Output Files
 
-Each solver writes to its own output file:
+Each solver writes to its own output file, and the filename includes the selected rule ID:
 
-- `output_brute_max_coverage.txt`
-- `output_greedy_max_coverage.txt`
-- `output_math_model_max_coverage.txt`
-- `output_dp_max_coverage.txt`
+- `output_brute_rule1.txt`
+- `output_greedy_rule2.txt`
+- `output_math_model_rule5.txt`
+- `output_dp_rule7.txt`
 
-The output contains only:
+The output contains only the final answer:
 
-- the selected rules
 - the covered passwords
+- or `null` if nothing is covered
 
 It does not include:
 
 - benchmark statistics
 - the full contents of `passwords.txt`
 - passwords that are not covered by the selected rules
+- the selected rules themselves
 
 If no result is available, the program prints `null`.
 
@@ -205,4 +206,3 @@ Then:
 For the detailed Vietnamese explanation of the theory, project behavior, and algorithm analysis, open:
 
 - [`description.md`](description.md)
-

@@ -6,7 +6,7 @@ except ImportError:
 
 def solve_max_coverage(k, passwords):
     """Goi giai phap bitmask exact."""
-    return run_solver("math model", solve_math_model, k, passwords, "output_math_model_max_coverage.txt")
+    return run_solver("math model", solve_math_model, k, passwords, "output_math_model")
 
 
 def check_password(k, passwords=None):

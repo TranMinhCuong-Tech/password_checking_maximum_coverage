@@ -6,7 +6,7 @@ except ImportError:
 
 def solve_max_coverage(k, passwords):
     """Goi giai phap tham lam xap xi."""
-    return run_solver("greedy", solve_greedy, k, passwords, "output_greedy_max_coverage.txt")
+    return run_solver("greedy", solve_greedy, k, passwords, "output_greedy")
 
 
 def check_password(k, passwords=None):

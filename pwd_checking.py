@@ -18,10 +18,10 @@ def printMenuAlgorithms():
     Nguoi dung se chon 1 trong 4 cach giai maximum coverage.
     """
     menu = """
-    [1] Brute Force (exact NP-hard search)
-    [2] Greedy (approximation)
-    [3] Math Model (bitmask exact)
-    [4] Dynamic Programming (memoized exact)
+    [1] Brute Force
+    [2] Greedy
+    [3] Math Model
+    [4] Dynamic Programming
     [0] Exit
     """
     print(menu)

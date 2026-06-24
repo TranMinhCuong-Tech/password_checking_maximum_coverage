@@ -6,7 +6,7 @@ except ImportError:
 
 def solve_max_coverage(k, passwords):
     """Goi giai phap exact bang duyet to hop."""
-    return run_solver("brute force", solve_bruteforce, k, passwords, "output_brute_max_coverage.txt")
+    return run_solver("brute force", solve_bruteforce, k, passwords, "output_brute")
 
 
 def check_password(k, passwords=None):

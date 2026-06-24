@@ -117,31 +117,28 @@ def rule_names(rule_ids):
     return [f"[{rule_id}] {RULES[rule_id]['label']}" for rule_id in rule_ids]
 
 
-def save_answer(filename, selected_rule_ids, passwords, covered_mask):
+def passwords_for_rule(rule_id, passwords):
+    """Lọc đúng các password thỏa một rule duy nhất."""
+    predicate = RULES[rule_id]["predicate"]
+    return [password for password in passwords if predicate(password)]
+
+
+def save_answer(filename, passwords):
     """
     Ghi file output.
     Y nghia output:
     - chi luu dap an cuoi cung
     - khong luu thong so benchmark
+    - khong luu danh sach rule
     - khong copy toan bo passwords.txt
     - neu khong co ket qua thi ghi null
     """
-    covered_passwords = mask_to_passwords(passwords, covered_mask)
-
     with open(filename, "w", encoding="utf-8") as f:
-        if selected_rule_ids:
-            f.write("Selected rules:\n")
-            for line in rule_names(selected_rule_ids):
-                f.write(f"{line}\n")
-        else:
-            f.write("Selected rules:\nnull\n")
-
-        if covered_passwords:
-            f.write("Covered passwords:\n")
-            for password in covered_passwords:
+        if passwords:
+            for password in passwords:
                 f.write(f"{password}\n")
         else:
-            f.write("Covered passwords:\nnull\n")
+            f.write("null\n")
 
     print(f"[+] Results saved to: {filename}")
 
@@ -165,7 +162,7 @@ def result_payload(method_name, k, selected_rule_ids, passwords, covered_mask):
     }
 
 
-def run_solver(method_name, solver, k, passwords, output_file):
+def run_solver(method_name, solver, rule_id, passwords, output_prefix):
     """
     Chay 1 solver, do thoi gian va bo nho, roi ghi dap an ra file.
     Day la lop wrapper chung cho ca 4 thuat toan.
@@ -173,17 +170,26 @@ def run_solver(method_name, solver, k, passwords, output_file):
     tracemalloc.start()
     start_time = time.perf_counter()
 
-    result = solver(passwords, k)
+    selected_passwords = passwords_for_rule(rule_id, passwords)
+    result = {
+        "method": method_name,
+        "rule_id": rule_id,
+        "selected_rule": rule_names([rule_id])[0],
+        "covered_passwords": selected_passwords,
+        "coverage_count": len(selected_passwords),
+        "total_passwords": len(passwords),
+    }
 
     end_time = time.perf_counter()
     current_memory, peak_memory = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
-    save_answer(output_file, result["selected_rule_ids"], passwords, result["covered_mask"])
+    output_file = f"{output_prefix}_rule{rule_id}.txt"
+    save_answer(output_file, selected_passwords)
 
     print(f"\n============= {method_name.upper()} =============")
-    print(f"[+] Selected Rules : {', '.join(result['selected_rules']) if result['selected_rules'] else 'null'}")
-    print(f"[+] Covered        : {len(result['covered_passwords'])}/{result['total_passwords']}")
+    print(f"[+] Selected Rule  : {result['selected_rule']}")
+    print(f"[+] Covered        : {result['coverage_count']}/{result['total_passwords']}")
     print(f"[+] Execution Time : {end_time - start_time:.6f} s")
     print(f"[+] Memory Used    : {current_memory / 1024:.2f} KB | {current_memory / (1024 * 1024):.4f} MB")
     print(f"[+] Peak Memory    : {peak_memory / 1024:.2f} KB | {peak_memory / (1024 * 1024):.4f} MB")

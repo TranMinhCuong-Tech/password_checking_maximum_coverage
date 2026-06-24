@@ -7,7 +7,7 @@ except ImportError:
 def printRuleCatalog():
     """
     In danh sach rule ung vien.
-    Day la tap cac set co the duoc chon trong bai toan maximum coverage.
+    Moi lan chay chi chon 1 rule de lay dung tap password tuong ung.
     """
     menu = """
     Candidate rules:
@@ -24,7 +24,7 @@ def printRuleCatalog():
 
 
 def _prompt_k():
-    """Nhap so rule can chon va kiem tra hop le."""
+    """Nhap ID cua rule can chon va kiem tra hop le."""
     while True:
         try:
             k = int(input(f"[+] Enter your choice: "))
@@ -37,9 +37,8 @@ def _prompt_k():
 
 def checkPassword(algorithm_module):
     """
-    Chon k rule va goi solver.
-    Ket qua in ra chi gom cac rule da chon va cac password duoc phu.
-    Nguoi dung co the nhap lai k neu muon chay tiep.
+    Chon 1 rule va goi solver.
+    Ket qua chi gom cac password thoa dung rule do.
     """
     try:
         passwords = algorithm_module.load_passwords()
@@ -53,6 +52,7 @@ def checkPassword(algorithm_module):
     while True:
         printRuleCatalog()
         print(f"[+] Total candidate rules: {len(RULES)}")
+        print("[+] Enter the rule ID you want to filter.")
         k = _prompt_k()
 
         if k == 0:
@@ -61,5 +61,5 @@ def checkPassword(algorithm_module):
             break
 
         # Goi solver theo thuat toan da chon.
-        print("[*] Solving maximum coverage...\n")
+        print("[*] Filtering passwords by the selected rule...\n")
         algorithm_module.solve_max_coverage(k, passwords)

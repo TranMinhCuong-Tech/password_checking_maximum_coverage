@@ -6,7 +6,7 @@ except ImportError:
 
 def solve_max_coverage(k, passwords):
     """Goi giai phap exact co memoization."""
-    return run_solver("dynamic programming", solve_dp, k, passwords, "output_dp_max_coverage.txt")
+    return run_solver("dynamic programming", solve_dp, k, passwords, "output_dp")
 
 
 def check_password(k, passwords=None):
