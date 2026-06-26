@@ -27,7 +27,7 @@ def showBanner():
         - mutated_passwords.txt: transformed password dataset
 
     Goal:
-        Select at most k rules from rules.py so the covered passwords are maximized.
+        Select exactly k rules from rules.py so the covered passwords are maximized.
     """
     print(description)
 

@@ -40,7 +40,7 @@
 The goal is not just to check passwords. Instead, the project is designed to:
 
 - model a real problem as a combinatorial optimization problem
-- compare brute force, greedy, bitmask, and dynamic programming approaches
+- compare brute force, greedy, 0-1 integer linear programming, and dynamic programming approaches
 - show the difference between exact and approximate solutions
 - demonstrate why NP-Hard problems become expensive as the input size grows
 
@@ -66,7 +66,7 @@ The main idea of the project is:
 - take a mutated password list in `mutated_passwords.txt`
 - treat each `rule` as a string transformation
 - if the transformed result matches a password in the real password set, that password is considered covered
-- choose at most `k` rules so that the number of covered real passwords is maximized
+- choose exactly `k` rules so that the number of covered real passwords is maximized
 
 This helps illustrate:
 
@@ -155,13 +155,13 @@ At each step, choose the rule that covers the largest number of newly covered pa
 - does not always guarantee the optimal answer
 - a common approximation strategy for Maximum Coverage
 
-### 3. Math Model
+### 3. ILP_PuLP_CBC
 
-Enumerate all subsets of rules using bitmasks.
+Formulate the problem as a 0-1 integer linear programming model and solve it with PuLP + CBC.
 
 - exact
-- makes set operations easy to understand
-- useful for learning how combinatorial problems can be encoded as bits
+- uses binary decision variables and linear coverage constraints
+- demonstrates how an optimization solver can handle Maximum Coverage directly
 
 ### 4. Dynamic Programming
 
@@ -191,18 +191,102 @@ Use recursion with memoization to avoid recomputing repeated states.
     ├── Brute_Force.py
     ├── Dynamic_Programming.py
     ├── Greedy.py
-    └── Math_Model.py
+    └── ILP_PuLP_CBC.py
 ```
 
 ## How to Run
 
 The main file is `__init__.py`.
 
+## Environment Setup
+
+The project uses a virtual environment so that dependencies stay isolated from your global Python installation.
+
+### 1. Create a virtual environment
+
+#### Windows
+
+```bash
+py -m venv .venv
+```
+or 
+
+```bash
+python -m venv .venv
+```
+
+#### Linux / macOS
+
+```bash
+python3 -m venv .venv
+```
+or
+
+```bash
+py -m venv .venv
+```
+
+### 2. Activate the virtual environment
+
+#### Windows PowerShell
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks the script, run this once in the same terminal:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+#### Windows Command Prompt
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+#### Linux / macOS
+
+```bash
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+Install all required packages from `requirements.txt`:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Windows
+
+```bash
+py -m pip install -r requirements.txt
+```
+
+If your system uses `python3`, you can also run:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+### 4. Run the project
+
 Run it with:
 
 ```bash
-python __init__.py
+py __init__.py
 ```
+
+If your system requires `python3`, use:
+
+```bash
+python3 __init__.py
+```
+
+On Windows, you can use `py __init__.py` or `py -3 __init__.py` depending on how Python is installed.
 
 Program flow:
 
@@ -223,7 +307,7 @@ Program flow:
 
 - `1`: Brute Force
 - `2`: Greedy
-- `3`: Math Model
+- `3`: ILP_PuLP_CBC
 - `4`: Dynamic Programming
 - `0`: return to the previous menu
 - `-1` or `e`: exit the program
@@ -234,7 +318,7 @@ Each solver writes its result to a separate output file, for example:
 
 - `output_brute_k5.txt`
 - `output_greedy_k3.txt`
-- `output_math_model_k10.txt`
+- `output_ILP_PuLP_CBC_k10.txt`
 - `output_dp_k7.txt`
 
 The output usually includes:

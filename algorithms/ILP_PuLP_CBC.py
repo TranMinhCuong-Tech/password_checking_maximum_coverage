@@ -1,12 +1,12 @@
 try:
-    from ..coverage_problem import run_solver, load_passwords, solve_math_model
+    from ..coverage_problem import run_solver, load_passwords, solve_ilp_pulp_cbc
 except ImportError:
-    from coverage_problem import run_solver, load_passwords, solve_math_model
+    from coverage_problem import run_solver, load_passwords, solve_ilp_pulp_cbc
 
 
 def solve_max_coverage(k, passwords):
-    # Goi giai phap bitmask exact
-    return run_solver("math model", solve_math_model, k, passwords, "output_math_model")
+    # Solve the Maximum Coverage ILP with PuLP and CBC.
+    return run_solver("ILP_PuLP_CBC", solve_ilp_pulp_cbc, k, passwords, "output_ILP_PuLP_CBC")
 
 
 def check_password(k, passwords=None):

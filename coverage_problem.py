@@ -4,6 +4,11 @@ import tracemalloc
 from functools import lru_cache
 
 try:
+    import pulp
+except ImportError:  # pragma: no cover - dependency is optional until installed
+    pulp = None
+
+try:
     from .rules import RULES, RULE_IDS
 except ImportError:
     from rules import RULES, RULE_IDS
@@ -220,43 +225,86 @@ def solve_greedy(passwords, k):
     return result_payload("greedy", k, selected_rule_ids, passwords, covered_mask)
 
 
-def solve_math_model(passwords, k):
+def solve_ilp_pulp_cbc(passwords, k):
     """
-    Exact bitmask model: duyet cac subset co dung k rule.
+    Exact 0-1 Integer Linear Programming model for Maximum Coverage.
+
+    Decision variables:
+    - x_i = 1 if rule i is selected
+    - y_j = 1 if password j is covered
+
+    Objective:
+    maximize sum(y_j)
+
+    Constraints:
+    - sum(x_i) = k
+    - y_j <= sum(a_ij * x_i) for every password j
+    - x_i, y_j are binary
+
+    The model is solved by PuLP using CBC.
     """
+    if pulp is None:
+        raise RuntimeError(
+            "PuLP is required for ILP_PuLP_CBC. Install it with `pip install pulp`."
+        )
+
     rule_masks = build_rule_masks(passwords)
     rule_ids = list(RULE_IDS)
     k = max(0, min(k, len(rule_ids)))
 
     if k == 0 or not get_universe_passwords(passwords):
-        return result_payload("math model", k, [], passwords, 0)
+        return result_payload("ILP_PuLP_CBC", k, [], passwords, 0)
 
-    best_subset_mask = 0
-    best_coverage_mask = 0
-    best_count = -1
-    total_subsets = 1 << len(rule_ids)
+    real_passwords = get_universe_passwords(passwords)
 
-    for subset_mask in range(total_subsets):
-        if subset_mask.bit_count() != k:
-            continue
+    problem = pulp.LpProblem("MaximumCoverage", pulp.LpMaximize)
+    x_vars = {
+        rule_id: pulp.LpVariable(f"x_{rule_id}", cat=pulp.LpBinary)
+        for rule_id in rule_ids
+    }
+    y_vars = {
+        index: pulp.LpVariable(f"y_{index}", cat=pulp.LpBinary)
+        for index in range(len(real_passwords))
+    }
 
-        coverage_mask = 0
-        for index, rule_id in enumerate(rule_ids):
-            if subset_mask & (1 << index):
-                coverage_mask |= rule_masks[rule_id]
+    problem += pulp.lpSum(y_vars[index] for index in range(len(real_passwords)))
+    problem += pulp.lpSum(x_vars[rule_id] for rule_id in rule_ids) == k
 
-        coverage_count = coverage_mask.bit_count()
-        if coverage_count > best_count:
-            best_count = coverage_count
-            best_subset_mask = subset_mask
-            best_coverage_mask = coverage_mask
+    for index, password in enumerate(real_passwords):
+        covering_rules = []
+        for rule_id in rule_ids:
+            if rule_masks[rule_id] & (1 << index):
+                covering_rules.append(x_vars[rule_id])
+
+        if covering_rules:
+            problem += y_vars[index] <= pulp.lpSum(covering_rules)
+        else:
+            problem += y_vars[index] == 0
+
+    solver = pulp.PULP_CBC_CMD(msg=False)
+    status = problem.solve(solver)
+    if pulp.LpStatus[status] != "Optimal":
+        raise RuntimeError(
+            f"CBC did not find an optimal solution. Status: {pulp.LpStatus[status]}"
+        )
 
     selected_rule_ids = [
         rule_id
-        for index, rule_id in enumerate(rule_ids)
-        if best_subset_mask & (1 << index)
+        for rule_id in rule_ids
+        if pulp.value(x_vars[rule_id]) and pulp.value(x_vars[rule_id]) > 0.5
     ]
-    return result_payload("math model", k, selected_rule_ids, passwords, best_coverage_mask)
+
+    coverage_mask = 0
+    for rule_id in selected_rule_ids:
+        coverage_mask |= rule_masks[rule_id]
+
+    return result_payload(
+        "ILP_PuLP_CBC",
+        k,
+        selected_rule_ids,
+        passwords,
+        coverage_mask,
+    )
 
 
 def solve_dp(passwords, k):

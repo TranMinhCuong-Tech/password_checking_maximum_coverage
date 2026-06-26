@@ -164,23 +164,26 @@ Ví dụ:
 - ban đầu chọn rule phủ 100 phần tử
 - ở bước sau, chọn rule phủ thêm 40 phần tử mới thay vì rule khác phủ thêm 35
 
-#### 5.3. Math Model
+#### 5.3. ILP_PuLP_CBC
 
 Ý tưởng:
 
-- mã hóa mỗi tập con bằng bitmask
-- duyệt các subset của rules
-- tính coverage bằng toán tử bit
+- xây dựng mô hình 0-1 Integer Linear Programming cho Maximum Coverage
+- biến quyết định nhị phân `x_i` cho biết có chọn rule `i` hay không
+- biến quyết định nhị phân `y_j` cho biết password `j` có được phủ hay không
+- giải bằng PuLP và CBC Solver
 
 Tính chất:
 
 - vẫn là lời giải chính xác
-- minh họa rất rõ cách biểu diễn tập hợp bằng bit
+- đúng với cách mô hình toán được viết trong lý thuyết tối ưu
+- dùng bitmask chỉ để dựng hệ số `a_ij` và tính coverage sau khi có nghiệm
 
 Ví dụ:
 
-- nếu password thứ 3 được phủ thì bit thứ 3 = 1
-- nếu rule phủ các password 1, 3, 4 thì bitmask tương ứng có các bit đó bật
+- nếu rule `i` được chọn thì `x_i = 1`
+- nếu password thứ 3 được phủ thì `y_3 = 1`
+- các ràng buộc đảm bảo một password chỉ được tính là phủ khi ít nhất một rule đã chọn sinh ra nó
 
 #### 5.4. Dynamic Programming
 
@@ -254,7 +257,7 @@ Chức năng:
 
 Chức năng:
 
-- in menu Brute Force / Greedy / Math Model / Dynamic Programming
+- in menu Brute Force / Greedy / ILP_PuLP_CBC / Dynamic Programming
 - nhận lựa chọn từ người dùng
 - gọi đúng module thuật toán tương ứng
 - xử lý các phím điều hướng như `0`, `-1`, `e`
@@ -284,7 +287,7 @@ Chức năng:
 - cài đặt 4 solver:
   - brute force
   - greedy
-  - math model
+  - ILP_PuLP_CBC
   - dynamic programming
 
 #### `algorithms/Brute_Force.py`
@@ -305,14 +308,14 @@ Chức năng:
 - gọi `solve_greedy()`
 - đặt tên output là `output_greedy`
 
-#### `algorithms/Math_Model.py`
+#### `algorithms/ILP_PuLP_CBC.py`
 
-Wrapper cho giải pháp bitmask exact.
+Wrapper cho giải pháp ILP exact dùng PuLP + CBC.
 
 Chức năng:
 
-- gọi `solve_math_model()`
-- đặt tên output là `output_math_model`
+- gọi `solve_ilp_pulp_cbc()`
+- đặt tên output là `output_ILP_PuLP_CBC`
 
 #### `algorithms/Dynamic_Programming.py`
 
@@ -458,7 +461,7 @@ Menu thuật toán cho phép chọn:
 
 - `1` Brute Force
 - `2` Greedy
-- `3` Math Model
+- `3` ILP_PuLP_CBC
 - `4` Dynamic Programming
 - `0` quay lại menu trước
 - `-1` hoặc `e` thoát chương trình
