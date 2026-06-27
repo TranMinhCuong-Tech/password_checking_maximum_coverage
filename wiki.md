@@ -260,7 +260,7 @@ Chức năng:
 - in menu Brute Force / Greedy / ILP_PuLP_CBC / Dynamic Programming
 - nhận lựa chọn từ người dùng
 - gọi đúng module thuật toán tương ứng
-- xử lý các phím điều hướng như `0`, `-1`, `e`
+- xử lý các phím điều hướng như `0`, `-1`
 
 #### `rules.py`
 
