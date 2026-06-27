@@ -71,7 +71,7 @@ The main idea of the project is:
 This helps illustrate:
 
 - how a practical problem can be mapped to an NP-Hard model
-- how sets can be represented with bitmasks
+- how sets can be represented directly with `set` and `frozenset`
 - how exact and approximate methods trade accuracy for speed
 
 ## NP Problem Used in This Project

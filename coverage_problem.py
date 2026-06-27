@@ -141,7 +141,7 @@ def result_payload(method_name, k, selected_rule_ids, passwords, covered_indices
         "k": k,
         "selected_rule_ids": selected_rule_ids,
         "selected_rules": rule_names(selected_rule_ids),
-        "covered_mask": covered_set,
+        "covered_set": covered_set,
         "covered_indices": covered_set,
         "covered_passwords": covered_passwords,
         "coverage_count": len(covered_set),
