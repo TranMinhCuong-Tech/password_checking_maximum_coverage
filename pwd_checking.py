@@ -85,12 +85,6 @@ def runAlgorithms(k, password_files):
         try:
             printMenuAlgorithms()
             choice_raw = input("\n[+] Nhap lua chon cua ban: ").strip().lower()
-
-            if choice_raw == "e":
-                # Ho tro go "e" de thoat nhanh.
-                print("[*] Dang thoat...\n")
-                return "exit"
-
             choice = int(choice_raw)
 
             if choice == 0:
